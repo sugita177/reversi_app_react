@@ -1,0 +1,27 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  # フロントエンドサービス
+  app:
+    # 現在のディレクトリにある Dockerfile をビルド
+    build:
+      context: .
+      dockerfile: Dockerfile
+    
+    # コンテナ名を設定
+    container_name: reversi_app_react
+    
+    # ホットリロードのためのポートマッピング
+    ports:
+      - "3000:3000"
+      
+    # ボリュームマウント: ローカルのソースコードをコンテナ内の /app に同期
+    volumes:
+      - .:/app
+      # ノードモジュールはコンテナ内で管理するため、上書きを避ける
+      - /app/node_modules
+      
+    # 開発サーバー起動コマンドを定義
+    # package.json に 'dev' または 'start' スクリプトが必要です
+    command: npm run dev
