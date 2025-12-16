@@ -4,7 +4,6 @@ describe('Disc (石の色) 値オブジェクト', () => {
 
   // 反転（Flip）メソッドのテスト
   it('should correctly flip the disc color', () => {
-    // Disc.BLACK, Disc.WHITE, Disc.EMPTY はまだ定義されていない
     const black = Disc.BLACK; 
     const white = Disc.WHITE;
     const empty = Disc.EMPTY;
