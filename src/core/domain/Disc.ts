@@ -9,7 +9,7 @@ export class Disc {
     this.color = color;
   }
 
-  // 1. 反転メソッド (flip)
+  // 反転メソッド (flip)
   public flip(): Disc {
     if (this.color === 'BLACK') return Disc.WHITE;
     if (this.color === 'WHITE') return Disc.BLACK;
@@ -17,7 +17,19 @@ export class Disc {
     return Disc.EMPTY;
   }
 
-  // 2. 静的な定数（ファクトリ）
+  /**
+   * 値オブジェクトの等価性を判定する（equalsメソッド）
+   * @param other - 比較対象の Disc
+   * @returns 値が等しければ true
+   */
+  public equals(other: Disc): boolean {
+    if (!(other instanceof Disc)) {
+      return false;
+    }
+    return this.color === other.color;
+  }
+
+  // 静的な定数（ファクトリ）
   public static readonly BLACK = new Disc('BLACK');
   public static readonly WHITE = new Disc('WHITE');
   public static readonly EMPTY = new Disc('EMPTY');

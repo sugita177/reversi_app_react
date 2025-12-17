@@ -15,4 +15,15 @@ describe('Disc (石の色) 値オブジェクト', () => {
     // 空を反転させても空のまま
     expect(empty.flip()).toBe(empty);
   });
+
+  // 等価性（Equality）のテスト
+  it('should be equal when two discs have the same color value', () => {
+      // Disc.BLACK などの参照が同じかどうかではなく、値が同じかを見る
+      // Disc クラスを一度 any にキャストしてから new することで、
+      // コンパイラの private チェックをバイパスします
+      const black1 = Disc.BLACK;
+      const black2 = new (Disc as any)('BLACK');
+      expect(black1.equals(black2)).toBe(true); // private constructor のため、便宜上 any キャスト
+      expect(black1.equals(Disc.WHITE)).toBe(false);
+  });
 });
