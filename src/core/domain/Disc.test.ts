@@ -4,7 +4,6 @@ describe('Disc (石の色) 値オブジェクト', () => {
 
   // 反転（Flip）メソッドのテスト
   it('should correctly flip the disc color', () => {
-    // Disc.BLACK, Disc.WHITE, Disc.EMPTY はまだ定義されていない
     const black = Disc.BLACK; 
     const white = Disc.WHITE;
     const empty = Disc.EMPTY;
@@ -15,5 +14,16 @@ describe('Disc (石の色) 値オブジェクト', () => {
     expect(white.flip()).toBe(black);
     // 空を反転させても空のまま
     expect(empty.flip()).toBe(empty);
+  });
+
+  // 等価性（Equality）のテスト
+  it('should be equal when two discs have the same color value', () => {
+      // Disc.BLACK などの参照が同じかどうかではなく、値が同じかを見る
+      // Disc クラスを一度 any にキャストしてから new することで、
+      // コンパイラの private チェックをバイパスします
+      const black1 = Disc.BLACK;
+      const black2 = new (Disc as any)('BLACK');
+      expect(black1.equals(black2)).toBe(true); // private constructor のため、便宜上 any キャスト
+      expect(black1.equals(Disc.WHITE)).toBe(false);
   });
 });
