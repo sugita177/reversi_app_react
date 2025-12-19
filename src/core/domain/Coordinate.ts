@@ -20,4 +20,12 @@ export class Coordinate {
     }
     return this.x === other.x && this.y === other.y;
   }
+
+  /** 
+   * 座標を一意の文字列キーに変換する（Mapのキー用）
+   * @returns 文字列キー（例：'3,4'）
+   */
+  public toKey(): string {
+    return `${this.x},${this.y}`;
+  }
 }
