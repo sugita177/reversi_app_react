@@ -94,4 +94,16 @@ export class Board {
       return flipped.length > 0;
     });
   }
+
+  /**
+   * 指定した色の石の数を数える
+   */
+  public countDiscs(disc: Disc): number {
+    // this.discs (Map) をループしてカウントする
+    let count = 0;
+    this.discs.forEach((targetDisc) => {
+        if (targetDisc === disc) count++;
+    })
+    return count;
+  }
 } 

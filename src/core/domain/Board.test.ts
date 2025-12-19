@@ -52,21 +52,39 @@ describe('Board (盤面) 値オブジェクト', () => {
 });
 
 describe('着手ルール (isLegalMove)', () => {
-    it('石がある場所には置けないこと', () => {
-      const board = Board.createInitialBoard();
-      const c33 = new Coordinate(3, 3); // 最初から白がある
-      expect(board.isLegalMove(c33, Disc.BLACK)).toBe(false);
-    });
-
-    it('相手の石を1つもひっくり返せない場所には置けないこと', () => {
-      const board = Board.createInitialBoard();
-      const c00 = new Coordinate(0, 0); // ここに置いても何も挟めない
-      expect(board.isLegalMove(c00, Disc.BLACK)).toBe(false);
-    });
-
-    it('有効な場所であれば true を返すこと', () => {
-      const board = Board.createInitialBoard();
-      const c23 = new Coordinate(2, 3); // さっきテストした場所
-      expect(board.isLegalMove(c23, Disc.BLACK)).toBe(true);
-    });
+  it('石がある場所には置けないこと', () => {
+    const board = Board.createInitialBoard();
+    const c33 = new Coordinate(3, 3); // 最初から白がある
+    expect(board.isLegalMove(c33, Disc.BLACK)).toBe(false);
   });
+
+  it('相手の石を1つもひっくり返せない場所には置けないこと', () => {
+    const board = Board.createInitialBoard();
+    const c00 = new Coordinate(0, 0); // ここに置いても何も挟めない
+    expect(board.isLegalMove(c00, Disc.BLACK)).toBe(false);
+  });
+
+  it('有効な場所であれば true を返すこと', () => {
+    const board = Board.createInitialBoard();
+    const c23 = new Coordinate(2, 3); // さっきテストした場所
+    expect(board.isLegalMove(c23, Disc.BLACK)).toBe(true);
+  });
+});
+
+describe('石のカウント (countDiscs)', () => {
+  it('初期状態で黒2つ、白2つであること', () => {
+    const board = Board.createInitialBoard();
+    expect(board.countDiscs(Disc.BLACK)).toBe(2);
+    expect(board.countDiscs(Disc.WHITE)).toBe(2);
+  });
+
+  it('石を置いた後、正しくカウントが更新されること', () => {
+    const board = Board.createInitialBoard();
+    // (2, 3) に黒を置くと、(3, 3) の白がひっくり返る
+    // 黒: 2 -> 4 (置いた分 +1, ひっくり返した分 +1)
+    // 白: 2 -> 1 (ひっくり返された分 -1)
+    const newBoard = board.move(new Coordinate(2, 3), Disc.BLACK);
+    expect(newBoard.countDiscs(Disc.BLACK)).toBe(4);
+    expect(newBoard.countDiscs(Disc.WHITE)).toBe(1);
+  });
+});
