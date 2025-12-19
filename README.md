@@ -121,6 +121,12 @@ docker exec -it reversi_app_react sh
 # Jestコマンドを実行
 npm run test
 ```
+
+またはコンテナ外から以下のコマンドで直接実行します。
+```bash
+docker exec -it reversi_app_react npm run test
+```
+
 ### 💡 今後の展望/改善点（Future Work）
 
 - **AI対戦機能の実装**: 現在は2人対戦のみですが、ミニマックス法を用いたAIロジックをサービスとして実装し、対戦相手として提供します。
