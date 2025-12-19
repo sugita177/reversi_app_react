@@ -1,3 +1,15 @@
+// 8方向の定義
+export const DIRECTIONS = [
+  { x: 0, y: -1 }, // 上
+  { x: 0, y: 1 },  // 下
+  { x: -1, y: 0 }, // 左
+  { x: 1, y: 0 },  // 右
+  { x: -1, y: -1 },// 左上
+  { x: 1, y: -1 }, // 右上
+  { x: -1, y: 1 }, // 左下
+  { x: 1, y: 1 },  // 右下
+];
+
 export class Coordinate {
   // 値オブジェクトは不変であるため、プロパティを readonly にする
   public readonly x: number;
@@ -27,5 +39,19 @@ export class Coordinate {
    */
   public toKey(): string {
     return `${this.x},${this.y}`;
+  }
+
+  
+  /**
+   * 指定された方向に移動した新しい座標を返す。
+   * 盤面外に出る場合は null を返す。
+   */
+  public getNeighbor(dx: number, dy: number): Coordinate | null {
+    try {
+      return new Coordinate(this.x + dx, this.y + dy);
+    } catch (e) {
+      // 範囲外(0-7以外)でエラーになる想定
+      return null;
+    }
   }
 }

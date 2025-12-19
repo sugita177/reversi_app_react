@@ -1,4 +1,4 @@
-import { Coordinate } from './Coordinate.ts';
+import { Coordinate, DIRECTIONS } from './Coordinate.ts';
 import { Disc } from './Disc.ts';
 
 export class Board {
@@ -34,5 +34,48 @@ export class Board {
     newDiscs.set(coord.toKey(), disc);
     // 新しい盤面を新規オブジェクトとして返す
     return new Board(newDiscs);
+  }
+
+  /**
+   * 石を置き、挟んだ石をひっくり返した新しい盤面を返す（着手）
+   */
+  public move(coord: Coordinate, disc: Disc): Board {
+    // 1. 石を置く
+    let nextDiscs = new Map(this.discs);
+    nextDiscs.set(coord.toKey(), disc);
+
+    // 2. 8方向に対してひっくり返せる石を探す
+    DIRECTIONS.forEach(dir => {
+      const flippedCoords = this.getFlippedCoordsInDirection(coord, dir.x, dir.y, disc);
+      flippedCoords.forEach(c => {
+        nextDiscs.set(c.toKey(), disc);
+      });
+    });
+
+    return new Board(nextDiscs);
+  }
+
+  /**
+   * 特定の方向でひっくり返る座標のリストを取得する（ヘルパーメソッド）
+   */
+  private getFlippedCoordsInDirection(start: Coordinate, dx: number, dy: number, myDisc: Disc): Coordinate[] {
+    const candidates: Coordinate[] = [];
+    let current = start.getNeighbor(dx, dy);
+
+    while (current !== null) {
+      const currentDisc = this.getDiscAt(current);
+      
+      // 空なら終了
+      if (currentDisc.equals(Disc.EMPTY)) return [];
+      
+      // 自分の石に到達したら、それまで溜めた候補を返す
+      if (currentDisc.equals(myDisc)) return candidates;
+      
+      // 相手の石なら候補に入れて、さらに先へ
+      candidates.push(current);
+      current = current.getNeighbor(dx, dy);
+    }
+
+    return []; // 盤面の端に到達した場合
   }
 } 

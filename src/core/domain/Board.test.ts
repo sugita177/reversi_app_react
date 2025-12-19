@@ -38,4 +38,15 @@ describe('Board (盤面) 値オブジェクト', () => {
     // 元の盤面は変わっていない（不変性の確認）
     expect(board.getDiscAt(target).equals(Disc.EMPTY)).toBe(true);
   });
+
+  it('石を置いたとき、挟んだ相手の石がひっくり返ること', () => {
+    const board = Board.createInitialBoard();
+    // 初期配置: (3,3)=白, (4,3)=黒
+    // (2,3)に黒を置くと、(3,3)の白がひっくり返るはず
+    const target = new Coordinate(2, 3);
+    const newBoard = board.move(target, Disc.BLACK);
+
+    expect(newBoard.getDiscAt(new Coordinate(3, 3)).equals(Disc.BLACK)).toBe(true);
+    expect(newBoard.getDiscAt(target).equals(Disc.BLACK)).toBe(true);
+  });
 });
