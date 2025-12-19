@@ -25,4 +25,17 @@ describe('Board (盤面) 値オブジェクト', () => {
     
     expect(board.getDiscAt(c00).equals(Disc.EMPTY)).toBe(true);
   });
+
+  it('指定した座標に石を置いた新しい盤面を返すこと', () => {
+    const board = Board.createInitialBoard();
+    const target = new Coordinate(2, 3);
+    
+    // (2,3) に黒を置く
+    const newBoard = board.placeDisc(target, Disc.BLACK);
+
+    // 新しい盤面では (2,3) に黒がある
+    expect(newBoard.getDiscAt(target).equals(Disc.BLACK)).toBe(true);
+    // 元の盤面は変わっていない（不変性の確認）
+    expect(board.getDiscAt(target).equals(Disc.EMPTY)).toBe(true);
+  });
 });

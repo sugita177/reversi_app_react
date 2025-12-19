@@ -26,4 +26,13 @@ export class Board {
 
     return new Board(initialDiscs);
   }
-}
+
+  public placeDisc(coord: Coordinate, disc: Disc): Board {
+    // 現在の盤面配置をコピー
+    const newDiscs = new Map(this.discs);
+    // 新しい碁石を配置する
+    newDiscs.set(coord.toKey(), disc);
+    // 新しい盤面を新規オブジェクトとして返す
+    return new Board(newDiscs);
+  }
+} 
