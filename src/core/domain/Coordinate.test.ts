@@ -20,4 +20,11 @@ describe('Coordinate (座標) 値オブジェクト', () => {
     expect(coordA.equals(coordB)).toBe(false);
     expect(coordA.equals(coordC)).toBe(false);
   });
+
+  it('0から7の範囲外の座標を指定した場合、エラーを投げること', () => {
+    expect(() => new Coordinate(-1, 0)).toThrow();
+    expect(() => new Coordinate(8, 0)).toThrow();
+    expect(() => new Coordinate(0, -1)).toThrow();
+    expect(() => new Coordinate(0, 8)).toThrow();
+  });
 });

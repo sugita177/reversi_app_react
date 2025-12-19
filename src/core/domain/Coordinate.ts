@@ -12,13 +12,15 @@ export const DIRECTIONS = [
 
 export class Coordinate {
   // 値オブジェクトは不変であるため、プロパティを readonly にする
-  public readonly x: number;
-  public readonly y: number;
+  private readonly _x: number;
+  private readonly _y: number;
 
   constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-    // 後で x, y の範囲チェックロジックを追加します
+    if (x < 0 || x > 7 || y < 0 || y > 7) {
+      throw new Error(`Invalid coordinate: (${x}, ${y})`);
+    }
+    this._x = x;
+    this._y = y;
   }
 
   /**
@@ -30,7 +32,7 @@ export class Coordinate {
     if (!(other instanceof Coordinate)) {
       return false;
     }
-    return this.x === other.x && this.y === other.y;
+    return this._x === other._x && this._y === other._y;
   }
 
   /** 
@@ -38,7 +40,7 @@ export class Coordinate {
    * @returns 文字列キー（例：'3,4'）
    */
   public toKey(): string {
-    return `${this.x},${this.y}`;
+    return `${this._x},${this._y}`;
   }
 
   
@@ -48,7 +50,7 @@ export class Coordinate {
    */
   public getNeighbor(dx: number, dy: number): Coordinate | null {
     try {
-      return new Coordinate(this.x + dx, this.y + dy);
+      return new Coordinate(this._x + dx, this._y + dy);
     } catch (e) {
       // 範囲外(0-7以外)でエラーになる想定
       return null;
