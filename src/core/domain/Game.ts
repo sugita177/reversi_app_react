@@ -38,4 +38,14 @@ export class Game {
 
     return new Game(nextBoard, nextPlayer);
   }
+
+  /**
+   * 現在のスコアを取得する
+   */
+  public get scores() {
+    return {
+      black: this._board.countDiscs(Disc.BLACK),
+      white: this._board.countDiscs(Disc.WHITE)
+    };
+  }
 }
