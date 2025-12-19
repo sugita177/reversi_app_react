@@ -50,3 +50,23 @@ describe('Board (盤面) 値オブジェクト', () => {
     expect(newBoard.getDiscAt(target).equals(Disc.BLACK)).toBe(true);
   });
 });
+
+describe('着手ルール (isLegalMove)', () => {
+    it('石がある場所には置けないこと', () => {
+      const board = Board.createInitialBoard();
+      const c33 = new Coordinate(3, 3); // 最初から白がある
+      expect(board.isLegalMove(c33, Disc.BLACK)).toBe(false);
+    });
+
+    it('相手の石を1つもひっくり返せない場所には置けないこと', () => {
+      const board = Board.createInitialBoard();
+      const c00 = new Coordinate(0, 0); // ここに置いても何も挟めない
+      expect(board.isLegalMove(c00, Disc.BLACK)).toBe(false);
+    });
+
+    it('有効な場所であれば true を返すこと', () => {
+      const board = Board.createInitialBoard();
+      const c23 = new Coordinate(2, 3); // さっきテストした場所
+      expect(board.isLegalMove(c23, Disc.BLACK)).toBe(true);
+    });
+  });

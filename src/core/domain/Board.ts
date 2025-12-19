@@ -78,4 +78,20 @@ export class Board {
 
     return []; // 盤面の端に到達した場合
   }
+
+  /**
+   * その座標に指定した色の石を置けるかどうかを判定する
+   */
+  public isLegalMove(coord: Coordinate, disc: Disc): boolean {
+    // 1. すでに石がある場合は置けない
+    if (!this.getDiscAt(coord).equals(Disc.EMPTY)) {
+      return false;
+    }
+
+    // 2. 8方向のうち、1つでもひっくり返せる石があればOK
+    return DIRECTIONS.some(dir => {
+      const flipped = this.getFlippedCoordsInDirection(coord, dir.x, dir.y, disc);
+      return flipped.length > 0;
+    });
+  }
 } 
