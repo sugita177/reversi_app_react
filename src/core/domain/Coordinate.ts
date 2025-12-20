@@ -1,3 +1,5 @@
+import { MIN_COORD, MAX_COORD } from "./Board.ts";
+
 // 8方向の定義
 export const DIRECTIONS = [
   { x: 0, y: -1 }, // 上
@@ -16,7 +18,7 @@ export class Coordinate {
   private readonly _y: number;
 
   constructor(x: number, y: number) {
-    if (x < 0 || x > 7 || y < 0 || y > 7) {
+    if (x < MIN_COORD || x > MAX_COORD || y < MIN_COORD || y > MAX_COORD) {
       throw new Error(`Invalid coordinate: (${x}, ${y})`);
     }
     this._x = x;
@@ -52,7 +54,7 @@ export class Coordinate {
     try {
       return new Coordinate(this._x + dx, this._y + dy);
     } catch (e) {
-      // 範囲外(0-7以外)でエラーになる想定
+      // 範囲外(MIN_COORD-MAX_COORD以外)でエラーになる想定
       return null;
     }
   }

@@ -1,11 +1,12 @@
 import { Coordinate } from './Coordinate'; 
+import { MIN_COORD, MAX_COORD } from './Board.ts';
 
 describe('Coordinate (座標) 値オブジェクト', () => {
 
   // 異なるインスタンスでも、値が同じなら等しいことをテストする
   it('should be equal when two coordinates have the same x and y values', () => {
-    const coord1 = new Coordinate(3, 5);
-    const coord2 = new Coordinate(3, 5);
+    const coord1 = new Coordinate(MIN_COORD, MAX_COORD);
+    const coord2 = new Coordinate(MIN_COORD, MAX_COORD);
     
     // 値オブジェクトとして、=== (参照比較) ではなく、専用の equal メソッドで比較する
     expect(coord1.equals(coord2)).toBe(true);
@@ -21,10 +22,10 @@ describe('Coordinate (座標) 値オブジェクト', () => {
     expect(coordA.equals(coordC)).toBe(false);
   });
 
-  it('0から7の範囲外の座標を指定した場合、エラーを投げること', () => {
-    expect(() => new Coordinate(-1, 0)).toThrow();
-    expect(() => new Coordinate(8, 0)).toThrow();
-    expect(() => new Coordinate(0, -1)).toThrow();
-    expect(() => new Coordinate(0, 8)).toThrow();
+  it('盤面の範囲外の座標を指定した場合、エラーを投げること', () => {
+    expect(() => new Coordinate(MIN_COORD - 1, MIN_COORD)).toThrow();
+    expect(() => new Coordinate(MAX_COORD + 1, MIN_COORD)).toThrow();
+    expect(() => new Coordinate(MIN_COORD, MIN_COORD - 1)).toThrow();
+    expect(() => new Coordinate(MIN_COORD, MAX_COORD + 1)).toThrow();
   });
 });

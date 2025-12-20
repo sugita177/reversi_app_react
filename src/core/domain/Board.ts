@@ -1,6 +1,11 @@
 import { Coordinate, DIRECTIONS } from './Coordinate.ts';
 import { Disc } from './Disc.ts';
 
+// 盤面のサイズを定義
+export const BOARD_SIZE = 8;
+export const MIN_COORD = 0;
+export const MAX_COORD = BOARD_SIZE - 1;
+
 export class Board {
   // 座標を文字列(例: "3,3")にして管理するMap
   private readonly discs: Map<string, Disc>;
@@ -18,11 +23,15 @@ export class Board {
   public static createInitialBoard(): Board {
     const initialDiscs = new Map<string, Disc>();
 
+    // 中央の座標を計算で求める (8*8マスなら3と4)
+    const midLow = (BOARD_SIZE / 2) - 1;
+    const midHigh = BOARD_SIZE / 2;
+
     // 中央の4つをセット
-    initialDiscs.set(new Coordinate(3, 3).toKey(), Disc.WHITE);
-    initialDiscs.set(new Coordinate(3, 4).toKey(), Disc.BLACK);
-    initialDiscs.set(new Coordinate(4, 3).toKey(), Disc.BLACK);
-    initialDiscs.set(new Coordinate(4, 4).toKey(), Disc.WHITE);
+    initialDiscs.set(new Coordinate(midLow, midLow).toKey(), Disc.WHITE);
+    initialDiscs.set(new Coordinate(midLow, midHigh).toKey(), Disc.BLACK);
+    initialDiscs.set(new Coordinate(midHigh, midLow).toKey(), Disc.BLACK);
+    initialDiscs.set(new Coordinate(midHigh, midHigh).toKey(), Disc.WHITE);
 
     return new Board(initialDiscs);
   }
@@ -111,8 +120,8 @@ export class Board {
    * 指定した色の石が置ける場所が少なくとも1つあるか判定する
    */
   public hasValidMove(disc: Disc): boolean {
-    for (let i = 0; i <= 7; i++) {
-      for (let j = 0; j <= 7; j++) {
+    for (let i = MIN_COORD; i <= MAX_COORD; i++) {
+      for (let j = MIN_COORD; j <= MAX_COORD; j++) {
         try {
           const coord = new Coordinate(i, j);
           if (this.isLegalMove(coord, disc) === true) {
