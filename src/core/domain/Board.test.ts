@@ -88,3 +88,21 @@ describe('石のカウント (countDiscs)', () => {
     expect(newBoard.countDiscs(Disc.WHITE)).toBe(1);
   });
 });
+
+describe('着手可能判定 (hasValidMove)', () => {
+  it('初期状態で黒は置ける場所があること', () => {
+    const board = Board.createInitialBoard();
+    expect(board.hasValidMove(Disc.BLACK)).toBe(true);
+  });
+
+  it('初期状態で白は置ける場所があること', () => {
+    const board = Board.createInitialBoard();
+    expect(board.hasValidMove(Disc.WHITE)).toBe(true);
+  });
+  
+  it('石が一つもない場所には置けないこと（特異な状況のテスト）', () => {
+    // 全て空の盤面（本来ありえませんが）を作ってテスト
+    const emptyBoard = new (Board as any)(new Map());
+    expect(emptyBoard.hasValidMove(Disc.BLACK)).toBe(false);
+  });
+});

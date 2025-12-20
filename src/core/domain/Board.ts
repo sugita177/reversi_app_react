@@ -106,4 +106,24 @@ export class Board {
     })
     return count;
   }
+
+  /**
+   * 指定した色の石が置ける場所が少なくとも1つあるか判定する
+   */
+  public hasValidMove(disc: Disc): boolean {
+    for (let i = 0; i <= 7; i++) {
+      for (let j = 0; j <= 7; j++) {
+        try {
+          const coord = new Coordinate(i, j);
+          if (this.isLegalMove(coord, disc) === true) {
+            return true;
+          }
+        } catch (e) {
+          // Coordinateの範囲外エラーは無視（通常ここには来ない）
+          continue;
+        }
+      }
+    }
+    return false;
+  }
 } 
