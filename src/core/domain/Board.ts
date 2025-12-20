@@ -135,4 +135,12 @@ export class Board {
     }
     return false;
   }
+
+  /**
+   * テスト用に任意の盤面状態を作成する
+   * @internal
+   */
+  public static createForTest(discs: Map<string, Disc>): Board {
+    return new Board(discs);
+  }
 } 

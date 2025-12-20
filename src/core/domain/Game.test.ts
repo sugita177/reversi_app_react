@@ -1,5 +1,5 @@
 import { Game } from './Game.ts';
-// import { Board } from './Board.ts';
+import { Board, MAX_COORD, MIN_COORD, BOARD_SIZE } from './Board.ts';
 import { Coordinate } from './Coordinate.ts';
 import { Disc } from './Disc.ts';
 
@@ -29,4 +29,72 @@ describe('Game (ゲーム進行) ドメインモデル', () => {
 
   // パスのテストは実際の盤面を作るのが難しいため、
   // ロジックが hasValidMove を正しく呼んでいることを実装で保証します
+});
+
+describe('Game (ゲーム進行) ドメインモデル - 総仕上げ', () => {
+  
+  describe('パスの判定', () => {
+    it('相手が打てない場合、手番が自分（現在のプレイヤー）のままになること（パス）', () => {
+      // 白がどこにも打てない盤面を構築
+      // （中央付近に黒を並べ、白を囲んでしまうような状態を想定）
+      const discs = new Map<string, Disc>();
+      const c33 = new Coordinate(3, 3);
+      const c34 = new Coordinate(3, 4);
+      const c35 = new Coordinate(3, 5);
+      
+      discs.set(c33.toKey(), Disc.BLACK);
+      discs.set(c34.toKey(), Disc.WHITE);
+      // c35に黒を置けば c34の白を挟める状態
+      
+      const customBoard = Board.createForTest(discs);
+      // 強制的に「黒の番、この盤面」から開始する内部用コンストラクタ的な呼び出し
+      const game = (Game as any).createForTest(customBoard, Disc.BLACK);
+
+      // 黒が c35 に打つ
+      const nextGame = game.play(c35);
+
+      // 本来なら白の番だが、白が打てず黒が打てるなら、手番は BLACK のまま
+      expect(nextGame.currentPlayer).toBe(Disc.BLACK);
+    });
+  });
+
+  describe('終局と勝敗判定', () => {
+    it('ゲーム終了時、石の数が多い方が勝者となること', () => {
+      // 盤面がほぼ埋まった状態をシミュレート
+      const discs = new Map<string, Disc>();
+      // 1 ~ 7 行目は全て黒
+      for (let i = MIN_COORD; i < MAX_COORD; i++) {
+        for (let j = MIN_COORD; j <= MAX_COORD; j++) {
+          discs.set((new Coordinate(i, j)).toKey(), Disc.BLACK);
+        }
+      }
+      discs.set((new Coordinate(MAX_COORD, MIN_COORD)).toKey(), Disc.BLACK);
+      for (let j = MIN_COORD + 1; j <= MAX_COORD - 1; j++) {
+        discs.set((new Coordinate(MAX_COORD, j)).toKey(), Disc.WHITE);
+      }
+      const customBoard = Board.createForTest(discs);
+      const game = (Game as any).createForTest(customBoard, Disc.BLACK);
+      const finishedGame = game.play(new Coordinate(MAX_COORD, MAX_COORD));
+
+      // game.isFinished が true になった時の game.result を検証
+      expect(finishedGame.isFinished).toBe(true);
+      expect(finishedGame.result.winner).toBe(Disc.BLACK);
+    });
+
+    it('引き分けの場合、勝者が EMPTY となること', () => {
+      // 黒 32マス vs 白 32マス の状態
+      const discs = new Map<string, Disc>();
+      for (let i = MIN_COORD; i <= MAX_COORD; i++) {
+        for (let j = MIN_COORD; j < BOARD_SIZE / 2; j++) {
+          discs.set((new Coordinate(i, j)).toKey(), Disc.BLACK);
+        }
+        for (let j = BOARD_SIZE / 2; j <= MAX_COORD / 2; j++) {
+          discs.set((new Coordinate(i, j)).toKey(), Disc.WHITE);
+        }
+      }
+      const customBoard = Board.createForTest(discs);
+      const game = (Game as any).createForTest(customBoard, Disc.BLACK);
+      expect(game.result.winner).toBe(Disc.EMPTY);
+    });
+  });
 });

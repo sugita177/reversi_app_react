@@ -2,6 +2,12 @@ import { Board } from './Board.ts';
 import { Disc } from './Disc.ts';
 import { Coordinate } from './Coordinate.ts';
 
+export interface GameResult {
+  black: number;
+  white: number;
+  winner: Disc;
+}
+
 export class Game {
   private readonly _board: Board;
   private readonly _currentPlayer: Disc;
@@ -65,7 +71,7 @@ export class Game {
   /**
    * 現在のスコアと勝者を判定する（UI用）
    */
-  public get result() {
+  public get result(): GameResult {
     const blackCount = this._board.countDiscs(Disc.BLACK);
     const whiteCount = this._board.countDiscs(Disc.WHITE);
     
@@ -80,5 +86,12 @@ export class Game {
       white: whiteCount,
       winner: winner
     };
+  }
+
+  /**
+   * テスト用に特定の状態からゲームを開始する
+   */
+  public static createForTest(board: Board, currentPlayer: Disc, isFinished: boolean = false): Game {
+    return new Game(board, currentPlayer, isFinished);
   }
 }
