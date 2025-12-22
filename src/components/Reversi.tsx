@@ -23,7 +23,7 @@ export const Reversi: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-8 p-8 bg-gray-100 min-h-screen">
-      <h1 className="text-4xl font-bold text-gray-800">React Othello</h1>
+      <h1 className="text-4xl font-bold text-gray-800">Reversi App</h1>
       
       {/* ステータス表示 */}
       <div className="flex gap-8 text-xl font-semibold">
