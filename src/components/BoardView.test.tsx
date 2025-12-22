@@ -7,7 +7,7 @@ import { Coordinate } from '../core/domain/Coordinate';
 describe('BoardView Component', () => {
   it('64個のマス目がレンダリングされること', () => {
     const board = Board.createInitialBoard();
-    render(<BoardView board={board} onSquareClick={() => {}} />);
+    render(<BoardView board={board} onSquareClick={() => {}} puttableCoordinates={[]} />);
     
     // Squareコンポーネントで設定した data-testid="square" を探す
     const squares = screen.getAllByTestId('square');
@@ -17,7 +17,7 @@ describe('BoardView Component', () => {
   it('マスをクリックした時に、正しい座標が渡されること', () => {
     const board = Board.createInitialBoard();
     const handleSquareClick = vi.fn();
-    render(<BoardView board={board} onSquareClick={handleSquareClick} />);
+    render(<BoardView board={board} onSquareClick={handleSquareClick} puttableCoordinates={[]} />);
     
     const squares = screen.getAllByTestId('square');
     // 例えば左上(0, 0)のマスをクリック
