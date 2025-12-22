@@ -18,7 +18,7 @@ export const BoardView: React.FC<BoardViewProps> = ({ board, onSquareClick, putt
       const coord = new Coordinate(x, y);
       const isPuttable = puttableCoordinates.includes(coord.toKey());
       squares.push(
-        <div key={coord.toKey()} className="w-12 h-12 sm:w-16 sm:h-16">
+        <div key={coord.toKey()} className="w-10 h-10 sm:w-12 sm:h-12">
           <Square
             disc={board.getDiscAt(coord)}
             onClick={() => onSquareClick(coord)}
