@@ -31,6 +31,25 @@ describe('Game (ゲーム進行) ドメインモデル', () => {
   // ロジックが hasValidMove を正しく呼んでいることを実装で保証します
 });
 
+describe('パス機能のテスト', () => {
+  it('skipTurnを実行すると、盤面は維持されたまま手番だけが交代すること', () => {
+    const game = Game.createInitialGame(); // 初期は BLACK
+    const boardBefore = game.board;
+    
+    const nextGame = game.skipTurn();
+    
+    expect(nextGame.currentPlayer).toBe(Disc.WHITE);
+    expect(nextGame.board).toBe(boardBefore); // 盤面(参照)が変わっていないこと
+  });
+
+  it('連続してskipTurnを実行すると、元の手番に戻ること', () => {
+    const game = Game.createInitialGame();
+    const secondPassGame = game.skipTurn().skipTurn();
+    
+    expect(secondPassGame.currentPlayer).toBe(Disc.BLACK);
+  });
+});
+
 describe('Game (ゲーム進行) ドメインモデル - 総仕上げ', () => {
   
   describe('パスの判定', () => {
