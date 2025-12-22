@@ -31,37 +31,41 @@ export class Game {
   }
 
   /**
-   * 石を打つ。ルールに基づき、手番交代・パス・終局を判定する。
+   * 石を打つ。
+   * 打った後は「相手の手番」に切り替えて返す。
    */
   public play(coord: Coordinate): Game {
-    if (this._isFinished) {
-      throw new Error("Game is already finished");
-    }
+    if (this._isFinished) throw new Error("Game is already finished");
+    if (!this.isPuttable(coord)) throw new Error("Invalid move");
 
-    if (!this._board.isLegalMove(coord, this._currentPlayer)) {
-      throw new Error("Invalid move");
-    }
-
-    // 1. 石を置いてひっくり返す
+    // 1. 石を置いて盤面を更新
     const nextBoard = this._board.move(coord, this._currentPlayer);
     
     // 2. 次のプレイヤー（相手）を決定
     const opponent = this.getOpponent(this._currentPlayer);
 
-    // 3. 次のプレイヤー（相手）が打てる場所があるか？
-    if (nextBoard.hasValidMove(opponent)) {
-      // 相手が打てるなら、手番を交代して続行
-      return new Game(nextBoard, opponent, false);
-    }
+    // 3. 次の状態のGameインスタンスを生成して返す
+    // ここでは単純に手番を交代させる（終局判定はコンストラクタか外部で行うのが綺麗）
+    return new Game(nextBoard, opponent, this.calculateIsFinished(nextBoard, opponent));
+  }
 
-    // 4. 相手は打てない。では、自分（現在のプレイヤー）はまだ打てる場所があるか？
-    if (nextBoard.hasValidMove(this._currentPlayer)) {
-      // 自分は打てるなら「パス」となり、手番は自分のまま続行
-      return new Game(nextBoard, this._currentPlayer, false);
-    }
+  /**
+   * 手番をスキップする（明示的なパス）
+   */
+  public skipTurn(): Game {
+    // すでに終了しているなら、状態を変えずに自分を返す
+    if (this._isFinished) return this;
+    const opponent = this.getOpponent(this._currentPlayer);
+    return new Game(this._board, opponent, this.calculateIsFinished(this._board, opponent));
+  }
 
-    // 5. どちらも打てる場所がないなら、ゲーム終了
-    return new Game(nextBoard, this._currentPlayer, true);
+  /**
+   * どちらも打てる場所がない場合に終局とみなす
+   */
+  private calculateIsFinished(board: Board, nextPlayer: Disc): boolean {
+    const opponent = this.getOpponent(nextPlayer);
+    // 次のプレイヤーも、その次のプレイヤーも打てないなら終了
+    return !board.hasValidMove(nextPlayer) && !board.hasValidMove(opponent);
   }
 
   private getOpponent(disc: Disc): Disc {
@@ -77,6 +81,13 @@ export class Game {
     return this._board.isLegalMove(coord, this._currentPlayer);
   }
 
+  /**
+   * 現在のプレイヤーが打てる場所があるか確認する
+   */
+  public canPlay(): boolean {
+    return this._board.hasValidMove(this._currentPlayer);
+  }
+  
   /**
    * 現在のスコアと勝者を判定する（UI用）
    */

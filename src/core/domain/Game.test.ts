@@ -34,14 +34,46 @@ describe('Game (ゲーム進行) ドメインモデル', () => {
 describe('Game (ゲーム進行) ドメインモデル - 総仕上げ', () => {
   
   describe('パスの判定', () => {
-    it('相手が打てない場合、手番が自分（現在のプレイヤー）のままになること（パス）', () => {
-      // 白がどこにも打てない盤面を構築
+    it('相手が打てない場合、skipTurnを呼ぶことで手番が戻ること', () => {
+      // 白だけがパスになる盤面を構築
+      // 例: 黒が打った後、盤面に白は存在しかつ、白には打ち手がないが、黒にはまだ空きマスがあり挟める場所がある状態
+      const discs = new Map<string, Disc>();
+      const c00 = new Coordinate(0, 0);
+      const c01 = new Coordinate(0, 1);
+      const c10 = new Coordinate(1, 0);
+      const c02 = new Coordinate(0, 2);
+
+      discs.set(c00.toKey(), Disc.BLACK);
+      discs.set(c01.toKey(), Disc.WHITE);
+      discs.set(c10.toKey(), Disc.WHITE);
+      // c35に黒を置けば c34の白を挟める状態
+      
+      const customBoard = Board.createForTest(discs);
+      // 強制的に「黒の番、この盤面」から開始する内部用コンストラクタ的な呼び出し
+      const game = (Game as any).createForTest(customBoard, Disc.BLACK);
+
+      // 黒が c35 に打つ
+      const nextGame = game.play(c02);
+
+      // ここで isFinished が false であることが重要
+      expect(nextGame.isFinished).toBe(false); 
+      expect(nextGame.canPlay()).toBe(false); // 白は打てない
+
+      // 2. 白がパスする
+      const passGame = nextGame.skipTurn();
+
+      // 3. 黒に戻る
+      expect(passGame.currentPlayer).toBe(Disc.BLACK);
+    });
+
+    it('両者打てる場所がなくなった場合、isFinishedがtrueになること', () => {
+      // 黒が打って、その後誰も打てなくなる盤面
       // （中央付近に黒を並べ、白を囲んでしまうような状態を想定）
       const discs = new Map<string, Disc>();
       const c33 = new Coordinate(3, 3);
       const c34 = new Coordinate(3, 4);
       const c35 = new Coordinate(3, 5);
-      
+
       discs.set(c33.toKey(), Disc.BLACK);
       discs.set(c34.toKey(), Disc.WHITE);
       // c35に黒を置けば c34の白を挟める状態
@@ -53,8 +85,13 @@ describe('Game (ゲーム進行) ドメインモデル - 総仕上げ', () => {
       // 黒が c35 に打つ
       const nextGame = game.play(c35);
 
-      // 本来なら白の番だが、白が打てず黒が打てるなら、手番は BLACK のまま
-      expect(nextGame.currentPlayer).toBe(Disc.BLACK);
+      // どちらも打てる場所がないので、ゲーム終了
+      expect(nextGame.isFinished).toBe(true);
+      expect(nextGame.currentPlayer).toBe(Disc.WHITE);
+  
+      // 終了している場合、skipTurnを呼んでもcurrentPlayerは変わらない（ガードの確認）
+      const afterSkip = nextGame.skipTurn();
+      expect(afterSkip.currentPlayer).toBe(nextGame.currentPlayer);
     });
   });
 
