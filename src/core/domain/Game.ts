@@ -69,6 +69,15 @@ export class Game {
   }
 
   /**
+   * 指定した座標に現在のプレイヤーが石を置けるか判定する
+   */
+  public isPuttable(coord: Coordinate): boolean {
+    // すでに Board にある isLegalMove に、
+    // 「今のプレイヤーの石の色」を渡すだけ
+    return this._board.isLegalMove(coord, this._currentPlayer);
+  }
+
+  /**
    * 現在のスコアと勝者を判定する（UI用）
    */
   public get result(): GameResult {

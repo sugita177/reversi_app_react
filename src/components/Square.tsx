@@ -4,9 +4,10 @@ import { Disc } from '../core/domain/Disc';
 interface SquareProps {
   disc: Disc;
   onClick: () => void;
+  isPuttable?: boolean;
 }
 
-export const Square: React.FC<SquareProps> = ({ disc, onClick }) => {
+export const Square: React.FC<SquareProps> = ({ disc, onClick, isPuttable }) => {
   // Discの種類に応じたスタイル
   const isBlack = disc.equals(Disc.BLACK);
   const isWhite = disc.equals(Disc.WHITE);
@@ -25,6 +26,11 @@ export const Square: React.FC<SquareProps> = ({ disc, onClick }) => {
           }`}
           data-testid={isBlack ? 'black-disc' : 'white-disc'}
         />
+      )}
+      
+      {/* 置ける場所のハイライト（石がない場合のみ） */}
+      {!isBlack && !isWhite && isPuttable && (
+        <div className="w-3 h-3 bg-black opacity-20 rounded-full" />
       )}
     </div>
   );

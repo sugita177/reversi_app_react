@@ -6,20 +6,23 @@ import { Square } from './Square';
 interface BoardViewProps {
   board: Board;
   onSquareClick: (coord: Coordinate) => void;
+  puttableCoordinates: string[];
 }
 
-export const BoardView: React.FC<BoardViewProps> = ({ board, onSquareClick }) => {
+export const BoardView: React.FC<BoardViewProps> = ({ board, onSquareClick, puttableCoordinates }) => {
   const squares = [];
 
   // 8x8のループを回してSquareを配置
   for (let y = 0; y < BOARD_SIZE; y++) {
     for (let x = 0; x < BOARD_SIZE; x++) {
       const coord = new Coordinate(x, y);
+      const isPuttable = puttableCoordinates.includes(coord.toKey());
       squares.push(
         <div key={coord.toKey()} className="w-12 h-12 sm:w-16 sm:h-16">
           <Square
             disc={board.getDiscAt(coord)}
             onClick={() => onSquareClick(coord)}
+            isPuttable={isPuttable}
           />
         </div>
       );

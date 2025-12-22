@@ -19,6 +19,17 @@ export const Reversi: React.FC = () => {
     }
   };
 
+  // 現在のプレイヤーが置ける座標を計算
+  const puttableCoordinates = [];
+  for (let y = 0; y < 8; y++) {
+    for (let x = 0; x < 8; x++) {
+      const coord = new Coordinate(x, y);
+      if (game.isPuttable(coord)) {
+        puttableCoordinates.push(coord.toKey());
+      }
+    }
+  }
+
   const { black, white, winner } = game.result;
 
   return (
@@ -36,7 +47,11 @@ export const Reversi: React.FC = () => {
       </div>
 
       {/* 盤面 */}
-      <BoardView board={game.board} onSquareClick={handleSquareClick} />
+      <BoardView
+        board={game.board}
+        onSquareClick={handleSquareClick}
+        puttableCoordinates={puttableCoordinates}
+      />
 
       {/* ゲーム終了メッセージ */}
       {game.isFinished && (
