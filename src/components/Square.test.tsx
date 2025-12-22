@@ -29,4 +29,15 @@ describe('Square Component', () => {
     
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
+
+  it('isPuttableがtrueの場合、ハイライト用のドットが表示されること', () => {
+    render(<Square disc={Disc.EMPTY} onClick={() => {}} isPuttable={true} />);
+    // ハイライト用要素に data-testid="puttable-indicator" を追加したと想定
+    expect(screen.getByTestId('puttable-indicator')).toBeInTheDocument();
+  });
+
+  it('isPuttableがfalseの場合、ハイライト用のドットが表示されないこと', () => {
+    render(<Square disc={Disc.EMPTY} onClick={() => {}} isPuttable={false} />);
+    expect(screen.queryByTestId('puttable-indicator')).not.toBeInTheDocument();
+  });
 });

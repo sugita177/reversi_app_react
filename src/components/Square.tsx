@@ -27,10 +27,13 @@ export const Square: React.FC<SquareProps> = ({ disc, onClick, isPuttable }) => 
           data-testid={isBlack ? 'black-disc' : 'white-disc'}
         />
       )}
-      
+
       {/* 置ける場所のハイライト（石がない場合のみ） */}
       {!isBlack && !isWhite && isPuttable && (
-        <div className="w-3 h-3 bg-black opacity-20 rounded-full" />
+        <div
+          className="w-3 h-3 bg-black opacity-20 rounded-full"
+          data-testid="puttable-indicator"
+        />
       )}
     </div>
   );

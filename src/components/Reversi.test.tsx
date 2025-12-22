@@ -40,4 +40,12 @@ describe('Reversi Component (Integration)', () => {
 
     expect(screen.getByText(/Black: 2/)).toBeInTheDocument();
   });
+  
+    it('初期状態で黒が置ける4箇所にハイライトが表示されていること', () => {
+    render(<Reversi />);
+    
+    // オセロの初期状態で黒が打てるのは (2,3), (3,2), (4,5), (5,4) の4箇所
+    const indicators = screen.getAllByTestId('puttable-indicator');
+    expect(indicators).toHaveLength(4);
+  });
 });

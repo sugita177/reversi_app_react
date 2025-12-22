@@ -28,4 +28,23 @@ describe('BoardView Component', () => {
     const calledCoord = handleSquareClick.mock.calls[0][0] as Coordinate;
     expect(calledCoord.toKey()).toBe("0,0");
   });
+
+  it('指定された座標のマスにのみハイライトが適用されること', () => {
+    const board = Board.createInitialBoard();
+    // (2, 3) と (3, 2) を置ける場所として指定
+    const puttableCoords = ["2,3", "3,2"]; 
+    
+    render(
+      <BoardView 
+        board={board} 
+        onSquareClick={() => {}} 
+        puttableCoordinates={puttableCoords} 
+      />
+    );
+  
+    const indicators = screen.getAllByTestId('puttable-indicator');
+    
+    // 指定した2箇所にインジケーターが出ているか
+    expect(indicators).toHaveLength(2);
+  });
 });
