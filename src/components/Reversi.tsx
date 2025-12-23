@@ -29,6 +29,7 @@ export const Reversi: React.FC = () => {
     const isAiTurn = gameMode === 'PvE' && game.currentPlayer.equals(Disc.WHITE);
     
     if (!game.isFinished && isAiTurn) {
+      const delay = isPass ? 1500 : 800; // パスの時は少し長めに表示を残す
       const timer = setTimeout(() => {
         if (isPass) {
           setGame(game.skipTurn());
@@ -36,7 +37,7 @@ export const Reversi: React.FC = () => {
           const move = ai.computeMove(game);
           if (move) setGame(game.play(move));
         }
-      }, 800); // 人間が目で追えるようにディレイを入れる
+      }, delay); // 人間が目で追えるようにディレイを入れる
       return () => clearTimeout(timer);
     }
   }, [game, gameMode, ai, isPass]);
@@ -52,61 +53,54 @@ export const Reversi: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center gap-2 p-2 bg-gray-100 min-h-screen overflow-hidden">
-      <h1 className="text-xl font-bold text-gray-800">Reversi App</h1>
-      
+      {/* ヘッダーとモード選択を1行にまとめて高さを圧縮 */}
+    <div className="flex items-center justify-between w-full max-w-sm px-2 mt-1">
+      <h1 className="text-lg font-bold text-gray-800">Reversi App</h1>
       {/* モード切替UI */}
-      <div className="flex bg-zinc-200 p-1 rounded-lg text-xs font-bold shadow-inner">
+      <div className="flex bg-zinc-200 p-0.5 rounded-lg text-[10px] font-bold shadow-inner">
         <button 
           onClick={() => { setGameMode('PvP'); setGame(Game.createInitialGame()); }}
-          className={`px-3 py-1 rounded ${gameMode === 'PvP' ? 'bg-white shadow' : 'text-zinc-500'}`}
+          className={`px-2 py-0.5 rounded cursor-pointer ${gameMode === 'PvP' ? 'bg-white shadow' : 'text-zinc-500'}`}
         >PvP (対人)</button>
         <button 
           onClick={() => { setGameMode('PvE'); setGame(Game.createInitialGame()); }}
-          className={`px-3 py-1 rounded ${gameMode === 'PvE' ? 'bg-white shadow' : 'text-zinc-500'}`}
+          className={`px-2 py-0.5 rounded cursor-pointer ${gameMode === 'PvE' ? 'bg-white shadow' : 'text-zinc-500'}`}
         >PvE (対CPU)</button>
       </div>
+    </div>
 
-      {/* ステータス表示エリア */}
-      <div className="flex gap-4 text-xl font-semibold mb-4">
-        {/* Black スコア */}
-        <div className={`
-          flex items-center gap-2 p-2 rounded-xl shadow-lg transition-all duration-300
-          ${game.currentPlayer.equals(Disc.BLACK) 
-            ? 'bg-zinc-800 text-white ring-4 ring-blue-500 scale-105' 
-            : 'bg-zinc-100 text-zinc-400 opacity-60 scale-100'}
-        `}>
-          {/* 石のアイコン：同化を防ぐために border-zinc-600 を追加 */}
-          <div className="w-4 h-4 bg-black border-2 border-zinc-500 rounded-full shadow-sm" />
-          <span>Black: {black}</span>
-        </div>
-          
-        {/* White スコア */}
-        <div className={`
-          flex items-center gap-2 p-2 rounded-xl shadow-lg transition-all duration-300
-          ${game.currentPlayer.equals(Disc.WHITE) 
-            ? 'bg-zinc-50 text-black ring-4 ring-blue-500 scale-105' 
-            : 'bg-zinc-100 text-zinc-400 opacity-60 scale-100'}
-        `}>
-          {/* 石のアイコン：白い背景でも見えるように border-zinc-300 を追加 */}
-          <div className="w-4 h-4 bg-white border-2 border-zinc-300 rounded-full shadow-sm" />
-          <span>White: {white}</span>
-        </div>
+      <div className="flex gap-2 text-xs font-semibold">
+      {/* Black スコア */}
+      <div className={`flex items-center gap-2 p-1 px-3 rounded-lg shadow-sm transition-all ${
+        game.currentPlayer.equals(Disc.BLACK) ? 'bg-zinc-800 text-white ring-2 ring-blue-400' : 'bg-zinc-100 text-zinc-400'
+      }`}>
+        <span>B: {black}</span>
       </div>
+      {/* White スコア */}
+      <div className={`flex items-center gap-2 p-1 px-3 rounded-lg shadow-sm transition-all ${
+        game.currentPlayer.equals(Disc.WHITE) ? 'bg-zinc-50 text-black ring-2 ring-blue-400' : 'bg-zinc-100 text-zinc-400'
+      }`}>
+        <span>W: {white}</span>
+      </div>
+    </div>
 
       {/* 盤面親要素：ここを相対配置(relative)にして、パス通知を重ねる準備をする */}
       <div className="relative flex flex-col items-center gap-2 mt-2">
         {/* パス通知エリア */}
         {isPass && (
-          <div className="absolute inset-0 flex flex-col items-center gap-4 p-6 bg-orange-100 border-2 border-orange-400 rounded-lg shadow-md animate-in fade-in zoom-in duration-300">
-            <p className="text-xl font-bold text-orange-800">
-              {game.currentPlayer.equals(Disc.BLACK) ? "Black" : "White"} has no moves!
-            </p>
-            <button 
-              onClick={() => setGame(game.skipTurn())}
-              className="px-8 py-3 bg-orange-500 text-white font-bold rounded-full hover:bg-orange-600 shadow-lg transform hover:scale-105 transition-all"
-            >
-              Pass Turn
-            </button>
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/20 backdrop-blur-[1px] rounded-lg">
+            <div className="bg-white p-3 rounded-lg shadow-xl border border-orange-400 flex flex-col items-center gap-2 animate-in zoom-in duration-200">
+              <p className="text-sm font-bold text-orange-800">
+                {game.currentPlayer.equals(Disc.BLACK) ? "Black" : "White"} Pass
+              </p>
+              {/* AIの番ならボタンを出さず、自動進行を待つ */}
+              {!(gameMode === 'PvE' && game.currentPlayer.equals(Disc.WHITE)) && (
+                <button 
+                  onClick={() => setGame(game.skipTurn())}
+                  className="px-4 py-1 text-xs bg-orange-500 text-white font-bold rounded-full cursor-pointer"
+                >OK</button>
+              )}
+            </div>
           </div>
         )}
   
@@ -122,7 +116,7 @@ export const Reversi: React.FC = () => {
           {/* ゲーム終了メッセージ */}
           {game.isFinished && (
             <div className="text-2xl font-bold text-red-600 animate-bounce">
-              Game Over! Winner: {winner.toString()}
+              Game Over! Winner: {winner.equals(Disc.BLACK) ? "Black" : winner.equals(Disc.WHITE) ? "White" : "Draw"}
             </div>
           )}
           
