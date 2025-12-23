@@ -137,6 +137,20 @@ export class Board {
   }
 
   /**
+   * 指定した座標に石を置いた場合に、合計で何枚の石がひっくり返るかを返す
+   */
+  public countFlips(coord: Coordinate, disc: Disc): number {
+    if (!this.getDiscAt(coord).equals(Disc.EMPTY)) return 0;
+    
+    let totalFlipped = 0;
+    DIRECTIONS.forEach(dir => {
+      const flipped = this.getFlippedCoordsInDirection(coord, dir.x, dir.y, disc);
+      totalFlipped += flipped.length;
+    });
+    return totalFlipped;
+  }
+
+  /**
    * テスト用に任意の盤面状態を作成する
    * @internal
    */

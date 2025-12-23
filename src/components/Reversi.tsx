@@ -1,45 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Game } from '../core/domain/Game';
 import { BoardView } from './BoardView';
 import { Coordinate } from '../core/domain/Coordinate';
 import { Disc } from '../core/domain/Disc';
+import { GreedyStrategy } from '../core/domain/ai/GreedyStrategy';
+
+type GameMode = 'PvP' | 'PvE';
 
 export const Reversi: React.FC = () => {
   // Game インスタンスを state として保持
   const [game, setGame] = useState(Game.createInitialGame());
-
-  const handleSquareClick = (coord: Coordinate) => {
-    try {
-      // ドメインロジックを実行して新しい状態を取得
-      const nextGame = game.play(coord);
-      setGame(nextGame);
-    } catch (e) {
-      // 置けない場所をクリックした場合は何もしない（または警告を出す）
-      console.error(e);
-    }
-  };
-
-  // 現在のプレイヤーが置ける座標を計算
-  const puttableCoordinates = [];
-  for (let y = 0; y < 8; y++) {
-    for (let x = 0; x < 8; x++) {
-      const coord = new Coordinate(x, y);
-      if (game.isPuttable(coord)) {
-        puttableCoordinates.push(coord.toKey());
-      }
-    }
-  }
+  const [gameMode, setGameMode] = useState<GameMode>('PvE');
+  const ai = useMemo(() => new GreedyStrategy(), []);
 
   const { black, white, winner } = game.result;
-
+  // 現在のプレイヤーが置ける座標を計算
+  const puttableCoordinates = useMemo(() => {
+    // Coordinate[] から string[] ("x,y" の形式) に変換する
+    return game.getPuttableCoordinates().map(coord => coord.toKey());
+  }, [game]);
   // パス判定
   const canPlay = puttableCoordinates.length > 0;
   const isPass = !game.isFinished && !canPlay;
+
+  // AIの思考処理
+  useEffect(() => {
+    // コンピュータが打つべきタイミングを判定
+    const isAiTurn = gameMode === 'PvE' && game.currentPlayer.equals(Disc.WHITE);
+    
+    if (!game.isFinished && isAiTurn) {
+      const timer = setTimeout(() => {
+        if (isPass) {
+          setGame(game.skipTurn());
+        } else {
+          const move = ai.computeMove(game);
+          if (move) setGame(game.play(move));
+        }
+      }, 800); // 人間が目で追えるようにディレイを入れる
+      return () => clearTimeout(timer);
+    }
+  }, [game, gameMode, ai, isPass]);
+
+  const handleSquareClick = (coord: Coordinate) => {
+    // AIの番の時は人間は打てない
+    if (gameMode === 'PvE' && game.currentPlayer.equals(Disc.WHITE)) return;
+    
+    if (game.isPuttable(coord)) {
+      setGame(game.play(coord));
+    }
+  };
 
   return (
     <div className="flex flex-col items-center gap-2 p-2 bg-gray-100 min-h-screen overflow-hidden">
       <h1 className="text-xl font-bold text-gray-800">Reversi App</h1>
       
+      {/* モード切替UI */}
+      <div className="flex bg-zinc-200 p-1 rounded-lg text-xs font-bold shadow-inner">
+        <button 
+          onClick={() => { setGameMode('PvP'); setGame(Game.createInitialGame()); }}
+          className={`px-3 py-1 rounded ${gameMode === 'PvP' ? 'bg-white shadow' : 'text-zinc-500'}`}
+        >PvP (対人)</button>
+        <button 
+          onClick={() => { setGameMode('PvE'); setGame(Game.createInitialGame()); }}
+          className={`px-3 py-1 rounded ${gameMode === 'PvE' ? 'bg-white shadow' : 'text-zinc-500'}`}
+        >PvE (対CPU)</button>
+      </div>
+
       {/* ステータス表示エリア */}
       <div className="flex gap-4 text-xl font-semibold mb-4">
         {/* Black スコア */}

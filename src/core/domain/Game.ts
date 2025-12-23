@@ -87,6 +87,20 @@ export class Game {
   public canPlay(): boolean {
     return this._board.hasValidMove(this._currentPlayer);
   }
+
+  /**
+   * 現在のプレイヤーが打てるすべての座標を取得する
+   */
+  public getPuttableCoordinates(): Coordinate[] {
+    const coords: Coordinate[] = [];
+    for (let y = 0; y < 8; y++) {
+      for (let x = 0; x < 8; x++) {
+        const c = new Coordinate(x, y);
+        if (this.isPuttable(c)) coords.push(c);
+      }
+    }
+    return coords;
+  }
   
   /**
    * 現在のスコアと勝者を判定する（UI用）
