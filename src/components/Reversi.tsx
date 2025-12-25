@@ -3,9 +3,9 @@ import { Game } from '../core/domain/Game';
 import { BoardView } from './BoardView';
 import { Coordinate } from '../core/domain/Coordinate';
 import { Disc } from '../core/domain/Disc';
-import { RandomStrategy, GreedyStrategy, StrongStrategy } from '../core/domain/ai';
+import { RandomStrategy, GreedyStrategy, StrongStrategy, ExpertStrategy } from '../core/domain/ai';
 
-type AIType = 'Random' | 'Greedy' | 'Strong';
+type AIType = 'Random' | 'Greedy' | 'Strong' | 'Expert';
 type GameMode = 'PvP' | 'PvE';
 
 export const Reversi: React.FC = () => {
@@ -19,6 +19,7 @@ export const Reversi: React.FC = () => {
     switch (aiType) {
       case 'Random': return new RandomStrategy();
       case 'Strong': return new StrongStrategy();
+      case 'Expert': return new ExpertStrategy();
       default: return new GreedyStrategy();
     }
   }, [aiType]);
@@ -92,6 +93,7 @@ export const Reversi: React.FC = () => {
           <option value="Random">LV1: Random</option>
           <option value="Greedy">LV2: Greedy</option>
           <option value="Strong">LV3: Strong</option>
+          <option value="Expert">LV4: Expert</option>
         </select>
       </div>
 
