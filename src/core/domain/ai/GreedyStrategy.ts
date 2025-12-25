@@ -1,9 +1,6 @@
 import { Game } from "../Game";
 import { Coordinate } from "../Coordinate";
-
-export interface AIStrategy {
-  computeMove(game: Game): Coordinate | null;
-}
+import { type AIStrategy } from "./AIStrategy";
 
 /**
  * 強欲法：最も多くの石を取れる場所を選択する

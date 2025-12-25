@@ -3,17 +3,27 @@ import { Game } from '../core/domain/Game';
 import { BoardView } from './BoardView';
 import { Coordinate } from '../core/domain/Coordinate';
 import { Disc } from '../core/domain/Disc';
-import { GreedyStrategy } from '../core/domain/ai/GreedyStrategy';
+import { RandomStrategy, GreedyStrategy, StrongStrategy } from '../core/domain/ai';
 
+type AIType = 'Random' | 'Greedy' | 'Strong';
 type GameMode = 'PvP' | 'PvE';
 
 export const Reversi: React.FC = () => {
   // Game インスタンスを state として保持
   const [game, setGame] = useState(Game.createInitialGame());
   const [gameMode, setGameMode] = useState<GameMode>('PvE');
-  const ai = useMemo(() => new GreedyStrategy(), []);
-
+  const [aiType, setAiType] = useState<AIType>('Greedy');
+  
+  // 選択されたタイプに応じたAIインスタンスを生成
+  const ai = useMemo(() => {
+    switch (aiType) {
+      case 'Random': return new RandomStrategy();
+      case 'Strong': return new StrongStrategy();
+      default: return new GreedyStrategy();
+    }
+  }, [aiType]);
   const { black, white, winner } = game.result;
+
   // 現在のプレイヤーが置ける座標を計算
   const puttableCoordinates = useMemo(() => {
     // Coordinate[] から string[] ("x,y" の形式) に変換する
@@ -54,35 +64,51 @@ export const Reversi: React.FC = () => {
   return (
     <div className="flex flex-col items-center gap-2 p-2 bg-gray-100 min-h-screen overflow-hidden">
       {/* ヘッダーとモード選択を1行にまとめて高さを圧縮 */}
-    <div className="flex items-center justify-between w-full max-w-sm px-2 mt-1">
-      <h1 className="text-lg font-bold text-gray-800">Reversi App</h1>
-      {/* モード切替UI */}
-      <div className="flex bg-zinc-200 p-0.5 rounded-lg text-[10px] font-bold shadow-inner">
-        <button 
-          onClick={() => { setGameMode('PvP'); setGame(Game.createInitialGame()); }}
-          className={`px-2 py-0.5 rounded cursor-pointer ${gameMode === 'PvP' ? 'bg-white shadow' : 'text-zinc-500'}`}
-        >PvP (対人)</button>
-        <button 
-          onClick={() => { setGameMode('PvE'); setGame(Game.createInitialGame()); }}
-          className={`px-2 py-0.5 rounded cursor-pointer ${gameMode === 'PvE' ? 'bg-white shadow' : 'text-zinc-500'}`}
-        >PvE (対CPU)</button>
+      <div className="flex items-center justify-between w-full max-w-sm px-2 mt-1">
+        <h1 className="text-lg font-bold text-gray-800">Reversi App</h1>
+
+        {/* モード切替UI */}
+        <div className="flex bg-zinc-200 p-0.5 rounded-lg text-[10px] font-bold shadow-inner">
+          <button 
+            onClick={() => { setGameMode('PvP'); setGame(Game.createInitialGame()); }}
+            className={`px-2 py-0.5 rounded cursor-pointer ${gameMode === 'PvP' ? 'bg-white shadow' : 'text-zinc-500'}`}
+          >PvP (対人)</button>
+          <button 
+            onClick={() => { setGameMode('PvE'); setGame(Game.createInitialGame()); }}
+            className={`px-2 py-0.5 rounded cursor-pointer ${gameMode === 'PvE' ? 'bg-white shadow' : 'text-zinc-500'}`}
+          >PvE (対CPU)</button>
+        </div>
+        {/* AIレベル選択セレクトボックス */}
+        <select 
+          disabled={gameMode === 'PvP'}
+          value={aiType} 
+          onChange={(e) => setAiType(e.target.value as AIType)}
+          className={`text-[10px] border rounded px-1 outline-none ${
+            gameMode === 'PvP' 
+            ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' 
+            : 'bg-white border-zinc-300 cursor-pointer'
+          }`}
+        >
+          <option value="Random">LV1: Random</option>
+          <option value="Greedy">LV2: Greedy</option>
+          <option value="Strong">LV3: Strong</option>
+        </select>
       </div>
-    </div>
 
       <div className="flex gap-2 text-xs font-semibold">
-      {/* Black スコア */}
-      <div className={`flex items-center gap-2 p-1 px-3 rounded-lg shadow-sm transition-all ${
-        game.currentPlayer.equals(Disc.BLACK) ? 'bg-zinc-800 text-white ring-2 ring-blue-400' : 'bg-zinc-100 text-zinc-400'
-      }`}>
-        <span>B: {black}</span>
+        {/* Black スコア */}
+        <div className={`flex items-center gap-2 p-1 px-3 rounded-lg shadow-sm transition-all ${
+          game.currentPlayer.equals(Disc.BLACK) ? 'bg-zinc-800 text-white ring-2 ring-blue-400' : 'bg-zinc-100 text-zinc-400'
+        }`}>
+          <span>B: {black}</span>
+        </div>
+        {/* White スコア */}
+        <div className={`flex items-center gap-2 p-1 px-3 rounded-lg shadow-sm transition-all ${
+          game.currentPlayer.equals(Disc.WHITE) ? 'bg-zinc-50 text-black ring-2 ring-blue-400' : 'bg-zinc-100 text-zinc-400'
+        }`}>
+          <span>W: {white}</span>
+        </div>
       </div>
-      {/* White スコア */}
-      <div className={`flex items-center gap-2 p-1 px-3 rounded-lg shadow-sm transition-all ${
-        game.currentPlayer.equals(Disc.WHITE) ? 'bg-zinc-50 text-black ring-2 ring-blue-400' : 'bg-zinc-100 text-zinc-400'
-      }`}>
-        <span>W: {white}</span>
-      </div>
-    </div>
 
       {/* 盤面親要素：ここを相対配置(relative)にして、パス通知を重ねる準備をする */}
       <div className="relative flex flex-col items-center gap-2 mt-2">
@@ -103,14 +129,14 @@ export const Reversi: React.FC = () => {
             </div>
           </div>
         )}
-  
+
         {/* 盤面 */}
         <BoardView
           board={game.board}
           onSquareClick={handleSquareClick}
           puttableCoordinates={puttableCoordinates}
         />
-  
+
         {/* 下部エリア：ゲーム終了とリセットボタンをコンパクトに */}
         <div className="flex flex-col items-center gap-2 mt-auto pb-4">
           {/* ゲーム終了メッセージ */}
@@ -119,7 +145,7 @@ export const Reversi: React.FC = () => {
               Game Over! Winner: {winner.equals(Disc.BLACK) ? "Black" : winner.equals(Disc.WHITE) ? "White" : "Draw"}
             </div>
           )}
-          
+
           <button 
             onClick={() => setGame(Game.createInitialGame())}
             className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer"
