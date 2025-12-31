@@ -69,6 +69,7 @@ export class AlphaBetaStrategy implements AIStrategy {
         const disc = game.board.getDiscAt(coord);
         if (disc.equals(Disc.EMPTY)) continue;
         const weight = this.WEIGHT_MAP[coord.toKey()] || 1;
+        // CPUは白であると仮定
         score += disc.equals(Disc.WHITE) ? weight : -weight;
       }
     }
