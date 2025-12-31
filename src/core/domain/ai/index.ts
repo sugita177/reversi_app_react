@@ -5,3 +5,4 @@ export * from './GreedyStrategy';
 export * from './StrongStrategy';
 export * from './ExpertStrategy';
 export * from './MinMaxStrategy';
+export * from './AlphaBehtaStrategy';
